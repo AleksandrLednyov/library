@@ -1,7 +1,9 @@
 package ru.lednyov.lib.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -22,7 +24,8 @@ import java.util.UUID;
 public class Author {
 
     @Id
-    @GeneratedValue(generator = "system-uuid")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "a_id")
     private UUID id;
     @NotNull
     @NotBlank

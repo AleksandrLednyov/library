@@ -1,21 +1,21 @@
 drop table if exists authors;
 
 create table authors (
-    id uuid not null primary key ,
+    a_id uuid not null primary key ,
     surname varchar(255) not null
 );
 
 drop table if exists books;
 
 create table books (
-    id uuid not null primary key ,
+    b_id uuid not null primary key ,
     title varchar(255) not null
 );
 
 drop table if exists books_authors;
 
 create table books_authors (
-    authors_id uuid not null ,
+    AUTHORS_ID uuid not null ,
     book_id uuid not null,
     primary key (authors_id, book_id)
 );

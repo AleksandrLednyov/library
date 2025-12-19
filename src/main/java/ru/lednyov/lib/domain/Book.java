@@ -1,7 +1,9 @@
 package ru.lednyov.lib.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
@@ -25,7 +27,8 @@ import java.util.UUID;
 public class Book {
 
     @Id
-    @GeneratedValue(generator = "system-uuid")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "b_id")
     private UUID id;
     @NotNull
     @NotBlank

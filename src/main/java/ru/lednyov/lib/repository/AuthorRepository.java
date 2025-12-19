@@ -9,5 +9,5 @@ import java.util.UUID;
 @Repository
 public interface AuthorRepository extends CrudRepository<Author, UUID> {
 
-    public Author findAuthorBySurname(String surname);
+    Author findAuthorBySurname(String surname);
 }

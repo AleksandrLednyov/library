@@ -8,12 +8,14 @@ import lombok.ToString;
 import ru.lednyov.lib.domain.Author;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
 @ToString
 public class BookDto {
 
+    private UUID id;
     @NotNull
     @NotBlank
     private String title;
