@@ -15,7 +15,7 @@ create table books (
 drop table if exists books_authors;
 
 create table books_authors (
-    AUTHORS_ID uuid not null ,
+    authors_id uuid not null ,
     book_id uuid not null,
     primary key (authors_id, book_id)
 );

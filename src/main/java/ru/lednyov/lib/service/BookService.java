@@ -9,7 +9,9 @@ import ru.lednyov.lib.domain.Book;
 import ru.lednyov.lib.repository.AuthorRepository;
 import ru.lednyov.lib.repository.BookRepository;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,17 +22,7 @@ public class BookService {
     private final AuthorRepository authorRepository;
 
     public Book saveNewBook(Book book) {
-        Set<Author> authors = book.getAuthors();
-        for (Author author: authors) {
-            if (author.getSurname().isEmpty()) throw new RuntimeException("Surname of author for book title " + book.getTitle() + " is empty");
-            Author savedBefore = authorRepository.findAuthorBySurname(author.getSurname());
-            if (savedBefore != null) {
-                author.setId(savedBefore.getId());
-            } else {
-                Author saved = authorRepository.save(author);
-                author.setId(saved.getId());
-            }
-        }
+        CheckAndSaveAuthor(book);
         return bookRepository.save(book);
     }
 
@@ -65,6 +57,35 @@ public class BookService {
         } else {
             log.info("Books by author with surname {} and title {} not found", surname, title);
             throw new RuntimeException("Books not found");
+        }
+    }
+
+
+    public Book updateBook(Book book) {
+        Optional<Book> optBook = bookRepository.findById(book.getId());
+        Book bookToUpdate = optBook.orElseThrow(() -> new RuntimeException("Book with id " + book.getId() + " not exists"));
+        CheckAndSaveAuthor(book);
+        bookToUpdate.setTitle(book.getTitle());
+        bookToUpdate.setAuthors(book.getAuthors());
+        bookRepository.save(bookToUpdate);
+        return bookToUpdate;
+    }
+
+    public void deleteBook(UUID id) {
+        bookRepository.deleteById(id);
+    }
+
+    private void CheckAndSaveAuthor(Book book) {
+        Set<Author> authors = book.getAuthors();
+        for (Author author: authors) {
+            if (author.getSurname().isEmpty()) throw new RuntimeException("Surname of author for book title " + book.getTitle() + " is empty");
+            Author savedBefore = authorRepository.findAuthorBySurname(author.getSurname());
+            if (savedBefore != null) {
+                author.setId(savedBefore.getId());
+            } else {
+                Author saved = authorRepository.save(author);
+                author.setId(saved.getId());
+            }
         }
     }
 }

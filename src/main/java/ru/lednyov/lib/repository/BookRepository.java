@@ -20,4 +20,6 @@ public interface BookRepository extends CrudRepository<Book, UUID> {
     @Query(value = "select * from books join books_authors on b_id = book_b_id join authors on a_id = authors_a_id where surname = :surname and title = :title",
             nativeQuery = true)
     Iterable<Book> findBooksByAuthorSurnameAndTitle(@Param("surname") String surname, @Param("title") String title);
+
+
 }

@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +27,7 @@ import ru.lednyov.lib.validation.BookValidationError;
 import ru.lednyov.lib.validation.BookValidationErrorBuilder;
 
 import java.net.URI;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/books")
@@ -43,7 +46,6 @@ public class BookController {
             return ResponseEntity.badRequest()
                     .body(BookValidationErrorBuilder.fromBindingErrors(errors));
         }
-
         Book savedBook = service.saveNewBook(mapper.dtoToBook(dto));
         log.info("New {} saved", mapper.bookToDto(savedBook));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -91,6 +93,26 @@ public class BookController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PatchMapping
+    public ResponseEntity<?> updateBook(@Valid @RequestBody BookDto dto) {
+        log.info("updateBook request received. {}", dto);
+        if (dto.getId() == null) {
+            throw new RuntimeException("Id is required" + dto);
+        }
+        Book updatedBook = service.updateBook(mapper.dtoToBook(dto));
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(updatedBook.getId())
+                .toUri();
+        return ResponseEntity.ok(location);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBook(@PathVariable UUID id) {
+        log.info("deleteBook request received. Book id: {}", id);
+        service.deleteBook(id);
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler
