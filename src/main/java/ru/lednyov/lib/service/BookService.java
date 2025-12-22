@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.lednyov.lib.domain.Author;
 import ru.lednyov.lib.domain.Book;
+import ru.lednyov.lib.exception.NotValidRequestException;
+import ru.lednyov.lib.exception.EntryNotFoundException;
 import ru.lednyov.lib.repository.AuthorRepository;
 import ru.lednyov.lib.repository.BookRepository;
 
@@ -35,8 +37,8 @@ public class BookService {
         if (books.iterator().hasNext()) {
             return books;
         } else {
-            log.info("Books by title not found");
-            throw new RuntimeException("Books not found");
+            log.warn("Books by title {} not found", title);
+            throw new EntryNotFoundException("Book by title "  + title + " not found");
         }
     }
 
@@ -45,8 +47,8 @@ public class BookService {
         if (books.iterator().hasNext()) {
             return books;
         } else {
-            log.info("Books by author with surname {} not found", surname);
-            throw new RuntimeException("Books not found");
+            log.warn("Books by author with surname {} not found", surname);
+            throw new EntryNotFoundException("Book by author surname "  + surname + " not found");
         }
     }
 
@@ -55,15 +57,15 @@ public class BookService {
         if (books.iterator().hasNext()) {
             return books;
         } else {
-            log.info("Books by author with surname {} and title {} not found", surname, title);
-            throw new RuntimeException("Books not found");
+            log.warn("Books by author with surname {} and title {} not found", surname, title);
+            throw new EntryNotFoundException("Book by autor surname " + surname + " and title " + title + " not found");
         }
     }
 
 
     public Book updateBook(Book book) {
         Optional<Book> optBook = bookRepository.findById(book.getId());
-        Book bookToUpdate = optBook.orElseThrow(() -> new RuntimeException("Book with id " + book.getId() + " not exists"));
+        Book bookToUpdate = optBook.orElseThrow(() -> new EntryNotFoundException("Book with id " + book.getId() + " not exists"));
         CheckAndSaveAuthor(book);
         bookToUpdate.setTitle(book.getTitle());
         bookToUpdate.setAuthors(book.getAuthors());
@@ -78,7 +80,7 @@ public class BookService {
     private void CheckAndSaveAuthor(Book book) {
         Set<Author> authors = book.getAuthors();
         for (Author author: authors) {
-            if (author.getSurname().isEmpty()) throw new RuntimeException("Surname of author for book title " + book.getTitle() + " is empty");
+            if (author.getSurname() == null || author.getSurname().isBlank()) throw new NotValidRequestException("Surname of author for book title " + book.getTitle() + " is blank or null");
             Author savedBefore = authorRepository.findAuthorBySurname(author.getSurname());
             if (savedBefore != null) {
                 author.setId(savedBefore.getId());

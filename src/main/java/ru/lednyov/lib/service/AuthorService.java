@@ -3,6 +3,7 @@ package ru.lednyov.lib.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.lednyov.lib.domain.Author;
+import ru.lednyov.lib.exception.AlreadyExistsException;
 import ru.lednyov.lib.repository.AuthorRepository;
 
 @Service
@@ -15,6 +16,6 @@ public class AuthorService {
         Author savedBefore = authorRepository.findAuthorBySurname(author.getSurname());
         if (savedBefore == null) {
             return authorRepository.save(author);
-        } else throw new RuntimeException("The author " + author.getSurname() + " is already exists");
+        } else throw new AlreadyExistsException("The author " + author.getSurname() + " is already exists");
     }
 }
